@@ -52,6 +52,7 @@ public partial class LocalizationManager : ObservableObject, IDisposable
                     "fra" => FrenchLocalization,
                     "spa" => SpanishLocalization,
                     "zho" => SimplifiedChineseLocalization,
+                    "ita" => ItalianLocalization,
                     _ => EnglishLocalization,
                 },
             Language.Ukrainian => UkrainianLocalization,
@@ -59,6 +60,7 @@ public partial class LocalizationManager : ObservableObject, IDisposable
             Language.French => FrenchLocalization,
             Language.Spanish => SpanishLocalization,
             Language.SimplifiedChinese => SimplifiedChineseLocalization,
+            Language.Italian => ItalianLocalization,
             _ => EnglishLocalization,
         };
 
