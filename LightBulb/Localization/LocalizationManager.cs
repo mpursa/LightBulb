@@ -1,10 +1,14 @@
 using System;
+using System.Collections.Generic;
+using System.ComponentModel;
 using System.Globalization;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using CommunityToolkit.Mvvm.ComponentModel;
 using LightBulb.Services;
 using LightBulb.Utils;
 using LightBulb.Utils.Extensions;
+using ThemeVariant = LightBulb.Framework.ThemeVariant;
 
 namespace LightBulb.Localization;
 
@@ -37,12 +41,8 @@ public partial class LocalizationManager : ObservableObject, IDisposable
     [ObservableProperty]
     public partial Language Language { get; set; } = Language.System;
 
-    private string Get([CallerMemberName] string? key = null)
-    {
-        if (string.IsNullOrWhiteSpace(key))
-            return string.Empty;
-
-        var localization = Language switch
+    private static IReadOnlyDictionary<string, string> GetLocalization(Language language) =>
+        language switch
         {
             Language.System =>
                 CultureInfo.CurrentUICulture.ThreeLetterISOLanguageName.ToLowerInvariant() switch
@@ -64,8 +64,13 @@ public partial class LocalizationManager : ObservableObject, IDisposable
             _ => EnglishLocalization,
         };
 
+    private string Get([CallerMemberName] string? key = null)
+    {
+        if (string.IsNullOrWhiteSpace(key))
+            return string.Empty;
+
         if (
-            localization.TryGetValue(key, out var value)
+            GetLocalization(Language).TryGetValue(key, out var value)
             || EnglishLocalization.TryGetValue(key, out value)
         )
         {
@@ -74,6 +79,90 @@ public partial class LocalizationManager : ObservableObject, IDisposable
 
         return $"Missing localization for '{key}'";
     }
+
+    // ------- Theme enumerator localization.
+    public List<string> ThemeEnumLocalized
+    {
+        get
+        {
+            var list = new List<string>();
+            foreach (var item in Enum.GetValues<ThemeVariant>())
+            {
+                list.Add(LocalizeTheme(item));
+            }
+
+            return list;
+        }
+    }
+
+    public string LocalizeTheme(ThemeVariant theme) =>
+        theme switch
+        {
+            ThemeVariant.System => ThemeSystem,
+            ThemeVariant.Light => ThemeLight,
+            ThemeVariant.Dark => ThemeDark,
+            _ => throw new InvalidEnumArgumentException(
+                $"Missing localization string for theme '{theme}'"
+            ),
+        };
+
+    public ThemeVariant ThemeFromLocalization(string local) =>
+        GetLocalization(Language).FirstOrDefault(x => x.Value == local).Key switch
+        {
+            nameof(ThemeSystem) => ThemeVariant.System,
+            nameof(ThemeLight) => ThemeVariant.Light,
+            nameof(ThemeDark) => ThemeVariant.Dark,
+            _ => throw new InvalidEnumArgumentException(
+                $"Missing theme for localized string '{local}'"
+            ),
+        };
+
+    // ------- Language enumerator localization.
+    public List<string> LanguageEnumLocalized
+    {
+        get
+        {
+            var list = new List<string>();
+            foreach (var item in Enum.GetValues<Language>())
+            {
+                list.Add(LocalizeLanguage(item));
+            }
+
+            return list;
+        }
+    }
+
+    public string LocalizeLanguage(Language lang) =>
+        lang switch
+        {
+            Language.System => LanguageSystem,
+            Language.English => LanguageEnglish,
+            Language.Ukrainian => LanguageUkrainian,
+            Language.German => LanguageGerman,
+            Language.French => LanguageFrench,
+            Language.Spanish => LanguageSpanish,
+            Language.SimplifiedChinese => LanguageSimplifiedChinese,
+            Language.Italian => LanguageItalian,
+            _ => throw new InvalidEnumArgumentException(
+                $"Missing localization string for language '{lang}'"
+            ),
+        };
+
+    public Language LanguageFromLocalization(string local) =>
+        GetLocalization(Language).FirstOrDefault(x => x.Value == local).Key switch
+        {
+            nameof(LanguageSystem) => Language.System,
+            nameof(LanguageEnglish) => Language.English,
+            nameof(LanguageUkrainian) => Language.Ukrainian,
+            nameof(LanguageGerman) => Language.German,
+            nameof(LanguageFrench) => Language.French,
+            nameof(LanguageSpanish) => Language.Spanish,
+            nameof(LanguageSimplifiedChinese) => Language.SimplifiedChinese,
+            nameof(LanguageItalian) => Language.Italian,
+            _ => throw new InvalidEnumArgumentException(
+                $"Missing language for localized string '{local}'"
+            ),
+        };
 
     public void Dispose() => _eventRoot.Dispose();
 }
@@ -120,9 +209,20 @@ public partial class LocalizationManager
     // ---- Advanced settings tab ----
 
     public string ThemeLabel => Get();
+    public string ThemeSystem => Get();
+    public string ThemeLight => Get();
+    public string ThemeDark => Get();
     public string ThemeTooltip => Get();
     public string LanguageLabel => Get();
     public string LanguageTooltip => Get();
+    public string LanguageSystem => Get();
+    public string LanguageEnglish => Get();
+    public string LanguageUkrainian => Get();
+    public string LanguageGerman => Get();
+    public string LanguageFrench => Get();
+    public string LanguageSpanish => Get();
+    public string LanguageSimplifiedChinese => Get();
+    public string LanguageItalian => Get();
     public string StartWithWindowsLabel => Get();
     public string StartWithWindowsTooltip => Get();
     public string AutoUpdateLabel => Get();

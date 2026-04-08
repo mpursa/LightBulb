@@ -15,7 +15,7 @@
             <ComboBox
                 Grid.Column="1"
                 ItemsSource="{Binding AvailableThemes}"
-                SelectedItem="{Binding Theme}" />
+                SelectedItem="{Binding ThemeLocalized}" />
         </Grid>
 
         <!--  Language  -->
@@ -25,7 +25,10 @@
                 VerticalAlignment="Center"
                 Text="{Binding LocalizationManager.LanguageLabel}"
                 TextTrimming="CharacterEllipsis" />
-            <ComboBox Grid.Column="1" ItemsSource="{Binding AvailableLanguages}" SelectedItem="{Binding Language}" />
+            <ComboBox 
+                Grid.Column="1" 
+                ItemsSource="{Binding AvailableLanguages}" 
+                SelectedItem="{Binding LanguageLocalized}" />
         </Grid>
 
         <!--  Auto start  -->

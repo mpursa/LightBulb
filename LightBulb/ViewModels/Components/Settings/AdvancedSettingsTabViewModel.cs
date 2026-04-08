@@ -13,7 +13,7 @@ public class AdvancedSettingsTabViewModel(
 {
     public override string DisplayName => LocalizationManager.AdvancedTabName;
 
-    public IReadOnlyList<ThemeVariant> AvailableThemes { get; } = Enum.GetValues<ThemeVariant>();
+    public IReadOnlyList<string> AvailableThemes { get; } = localizationManager.ThemeEnumLocalized;
 
     public ThemeVariant Theme
     {
@@ -21,12 +21,37 @@ public class AdvancedSettingsTabViewModel(
         set => SettingsService.Theme = value;
     }
 
-    public IReadOnlyList<Language> AvailableLanguages { get; } = Enum.GetValues<Language>();
+    public string ThemeLocalized
+    {
+        get => LocalizationManager.LocalizeTheme(Theme);
+        //set => Theme = LocalizationManager.ThemeFromLocalization(value ?? ThemeLocalized);
+        set
+        {
+            if (value == null)
+                return;
+            Theme = LocalizationManager.ThemeFromLocalization(value);
+        }
+    }
+
+    public IReadOnlyList<string> AvailableLanguages { get; } =
+        localizationManager.LanguageEnumLocalized;
 
     public Language Language
     {
         get => SettingsService.Language;
         set => SettingsService.Language = value;
+    }
+
+    public string LanguageLocalized
+    {
+        get => LocalizationManager.LocalizeLanguage(Language);
+        // set => Language = LocalizationManager.LanguageFromLocalization(value ?? LanguageLocalized);
+        set
+        {
+            if (value == null)
+                return;
+            Language = LocalizationManager.LanguageFromLocalization(value);
+        }
     }
 
     public bool IsAutoStartEnabled
